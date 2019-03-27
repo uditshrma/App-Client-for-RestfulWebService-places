@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:id="@+id/cv"
+    android:clickable="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="1dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#00BCD4"
+                android:elevation="3dp"
+                android:orientation="horizontal" >
+
+                <!--<ImageView
+                    android:id="@+id/img1"
+                    android:layout_width="60dp"
+                    android:layout_weight = "1"
+                    android:layout_height="60dp"
+                    android:background="#16000000"/>-->
+                <TextView
+                    android:id="@+id/user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="15dp"
+                    android:text="Name"
+                    android:textColor="#606364"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/user_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:layout_marginRight="30dp"
+                    android:text="User ID"
+                    android:textColor="#ebedee"
+                    android:textSize="14sp" />
+
+                <!--<TextView
+                    android:id="@+id/user_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:shadowColor="#000000"
+                    android:shadowDx="1"
+                    android:shadowDy="1"
+                    android:shadowRadius="1"
+                    android:layout_marginRight="30dp"
+                    android:text="User ID"
+                    android:textColor="#E3EDF8"
+                    android:textSize="14dp" />-->
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="@drawable/list_item_gradient">
+
+                <!--<ImageView
+                    android:id="@+id/img1"
+                    android:layout_width="60dp"
+                    android:layout_weight = "1"
+                    android:layout_height="60dp"
+                    android:background="#16000000"/>-->
+                <TextView
+                    android:id="@+id/pass_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="15dp"
+                    android:text="password"
+                    android:textColor="#BABBBB"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/reg_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="15dp"
+                    android:text="registration date"
+                    android:textColor="#BABBBB"
+                    android:textSize="14sp" />
+
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/profile_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/profile_toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/gradient">
+
+            <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+                android:id="@+id/calendarView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profile_background"
+                app:layout_constraintVertical_bias="0.19"
+                app:mcv_dateTextAppearance="@style/CalenderViewDateCustomText"
+                app:mcv_tileSize="45dp"
+                app:mcv_weekDayTextAppearance="@style/CalenderViewWeekCustomText" />
+
+            <TextView
+                android:id="@+id/display_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:elevation="2dp"
+                android:paddingTop="8dp"
+                android:text="Name"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="20sp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/p_user_id"
+                app:layout_constraintStart_toStartOf="@+id/profile_background" />
+
+            <TextView
+                android:id="@+id/p_user_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:elevation="2dp"
+                android:paddingTop="8dp"
+                android:text="User ID"
+                app:layout_constraintStart_toEndOf="@+id/display_name"
+                app:layout_constraintTop_toTopOf="@+id/profile_background" />
+
+            <TextView
+                android:id="@+id/p_reg_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="6dp"
+                android:elevation="2dp"
+                android:paddingBottom="8dp"
+                android:text="Date"
+                app:layout_constraintStart_toStartOf="@+id/profile_background"
+                app:layout_constraintTop_toBottomOf="@+id/display_name" />
+
+            <TextView
+                android:id="@+id/user_pwd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:elevation="2dp"
+                android:paddingBottom="8dp"
+                android:text="----"
+                app:layout_constraintBaseline_toBaselineOf="@+id/p_reg_date"
+                app:layout_constraintStart_toEndOf="@+id/p_reg_date" />
+
+            <ImageView
+                android:id="@+id/profile_background"
+                android:layout_width="224dp"
+                android:layout_height="61dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/profile_pic"
+                app:layout_constraintStart_toEndOf="@+id/profile_pic"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.88"
+                app:srcCompat="@drawable/user_data_bg" />
+
+            <ImageView
+                android:id="@+id/profile_pic"
+                android:layout_width="77dp"
+                android:layout_height="77dp"
+                android:layout_marginTop="8dp"
+                android:outlineProvider="bounds"
+                android:elevation="5dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/user_profile" />
+
+            <TextView
+                android:id="@+id/date_place_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="21dp"
+                android:layout_marginEnd="10dp"
+                android:maxLines="4"
+                android:singleLine="false"
+                android:text="Information"
+                app:layout_constraintEnd_toStartOf="@+id/to_maps"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider_grd" />
+
+            <Button
+                android:id="@+id/to_maps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="45dp"
+                android:onClick="toMapsActivity"
+                android:text="Check"
+                android:theme="@style/AppTheme.Button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider_grd" />
+
+            <ImageView
+                android:id="@+id/divider_grd"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="60dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/calendarView"
+                app:srcCompat="@drawable/divider_gradient" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/date_place_info"
+                app:layout_constraintEnd_toEndOf="@+id/date_place_info"
+                app:layout_constraintStart_toStartOf="@+id/date_place_info"
+                app:layout_constraintTop_toTopOf="@+id/date_place_info" />
+
+        </android.support.constraint.ConstraintLayout>
+    </ScrollView>
+
+</android.support.constraint.ConstraintLayout>

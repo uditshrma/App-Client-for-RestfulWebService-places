@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/date_picker"
+        android:icon="@drawable/ic_date_icon"
+        android:title="Select Date"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/fav"
+        android:icon="@drawable/ic_fav_border"
+        android:title="Add to wish list"
+        app:showAsAction="ifRoom" />
+
+</menu>
