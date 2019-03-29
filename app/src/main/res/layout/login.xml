@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dip"
             android:background="@null"
-            android:onClick="navigatetoRegisterActivity"
+            android:onClick="navigateToRegisterActivity"
             android:text="Signup"
             android:textColor="#228b22"
             android:textStyle="bold" />

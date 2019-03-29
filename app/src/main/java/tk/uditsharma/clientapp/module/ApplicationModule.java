@@ -2,6 +2,7 @@ package tk.uditsharma.clientapp.module;
 
 import android.app.Application;
 import android.util.Base64;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,13 +28,13 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import tk.uditsharma.clientapp.model.UserDao;
 import tk.uditsharma.clientapp.model.UserDataAPI;
+import tk.uditsharma.clientapp.util.Constants;
+import tk.uditsharma.clientapp.util.RequestAuthenticationInterceptor;
 
 @Module
 public class ApplicationModule {
 
     private final Application application;
-
-    private String encodedString = null;
 
     public ApplicationModule(Application pApp){
         this.application = pApp;
@@ -68,33 +69,14 @@ public class ApplicationModule {
 
     @Singleton
     @Provides
-    public OkHttpClient provideOkHttpClient(Interceptor interceptor){
+    public OkHttpClient provideOkHttpClient(RequestAuthenticationInterceptor interceptor){
         return new OkHttpClient.Builder().addInterceptor(interceptor).build();
     }
 
     @Singleton
     @Provides
-    public Interceptor provideInterceptor(){
-
-        try {
-            encodedString = Base64.encodeToString(
-                    UserDao.getToken().getBytes("UTF-8"),Base64.NO_WRAP);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        return new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request originalRequest = chain.request();
-
-                Request.Builder builder = originalRequest.newBuilder().header("Authorization",
-                        "Bearer " + encodedString);
-
-                Request newRequest = builder.build();
-                return chain.proceed(newRequest);
-            }
-        };
+    public RequestAuthenticationInterceptor provideInterceptor(){
+        return new RequestAuthenticationInterceptor();
     }
 
     @Singleton

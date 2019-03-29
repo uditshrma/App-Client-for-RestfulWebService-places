@@ -6,7 +6,8 @@ public class UserDao {
     //static User cUser;
     private static String currentUser;
     private static String currentName;
-    private static String token;
+    private static String token = null;
+    private static String credentials;
     //private static Context mContext;
 
     public static String getCurrentUser() {
@@ -31,5 +32,13 @@ public class UserDao {
 
     public static void setCurrentName(String currentName) {
         UserDao.currentName = currentName;
+    }
+
+    public static String getCredentials() {
+        return credentials;
+    }
+
+    public static void setCredentials(String credentials) {
+        UserDao.credentials = credentials;
     }
 }
