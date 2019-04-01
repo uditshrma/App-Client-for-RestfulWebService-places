@@ -2,6 +2,7 @@ package tk.uditsharma.clientapp.module;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
+import tk.uditsharma.clientapp.RegisterActivity;
 import tk.uditsharma.clientapp.view.LoginActivity;
 import tk.uditsharma.clientapp.view.MapsActivity;
 import tk.uditsharma.clientapp.view.UserListActivity;
@@ -21,5 +22,8 @@ public abstract class ActivityBuilder {
 
     @ContributesAndroidInjector
     abstract LoginActivity bindLoginActivity();
+
+    @ContributesAndroidInjector
+    abstract RegisterActivity bindRegisterActivity();
 
 }

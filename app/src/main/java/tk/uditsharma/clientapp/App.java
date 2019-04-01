@@ -19,7 +19,7 @@ public class App extends Application implements HasActivityInjector {
     @Inject
     DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
 
-    //private SingletonComponent singletonApplicationComponent;
+    private SingletonComponent singletonApplicationComponent;
 
     public static App get(Activity activity){
         return (App) activity.getApplication();
@@ -29,7 +29,7 @@ public class App extends Application implements HasActivityInjector {
     public void onCreate() {
         super.onCreate();
         MapsInitializer.initialize(this);
-        SingletonComponent singletonApplicationComponent = DaggerSingletonComponent.builder()
+        singletonApplicationComponent = DaggerSingletonComponent.builder()
                 .application(this)
                 .applicationModule(new ApplicationModule(this))
                 .build();
@@ -37,9 +37,9 @@ public class App extends Application implements HasActivityInjector {
         singletonApplicationComponent.inject(this);
     }
 
-    /*public SingletonComponent getSingletonApplicationComponent(){
+    public SingletonComponent getSingletonApplicationComponent(){
         return singletonApplicationComponent;
-    }*/
+    }
 
     @Override
     public AndroidInjector<Activity> activityInjector() {

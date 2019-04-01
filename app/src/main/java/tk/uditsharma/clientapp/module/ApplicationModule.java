@@ -1,8 +1,6 @@
 package tk.uditsharma.clientapp.module;
 
 import android.app.Application;
-import android.util.Base64;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -11,8 +9,6 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
 
@@ -20,18 +16,14 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import tk.uditsharma.clientapp.model.UserDao;
 import tk.uditsharma.clientapp.model.UserDataAPI;
-import tk.uditsharma.clientapp.util.Constants;
 import tk.uditsharma.clientapp.util.RequestAuthenticationInterceptor;
 
-@Module
+@Module(includes = RegisterModule.class)
 public class ApplicationModule {
 
     private final Application application;

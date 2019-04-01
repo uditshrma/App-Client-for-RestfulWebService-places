@@ -10,6 +10,7 @@ import tk.uditsharma.clientapp.interfaces.ViewModelKey;
 import tk.uditsharma.clientapp.util.DaggerViewModelFactory;
 import tk.uditsharma.clientapp.viewmodel.LoginViewModel;
 import tk.uditsharma.clientapp.viewmodel.PlaceViewModel;
+import tk.uditsharma.clientapp.viewmodel.RegisterViewModel;
 import tk.uditsharma.clientapp.viewmodel.UserViewModel;
 
 @Module
@@ -29,6 +30,11 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(LoginViewModel.class)
     abstract ViewModel provideLoginViewModel(LoginViewModel loginViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(RegisterViewModel.class)
+    abstract ViewModel provideRegisterViewModel(RegisterViewModel loginViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(DaggerViewModelFactory factory);

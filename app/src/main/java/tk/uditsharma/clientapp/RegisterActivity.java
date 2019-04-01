@@ -1,32 +1,34 @@
 package tk.uditsharma.clientapp;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import javax.inject.Inject;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import dagger.android.AndroidInjection;
+import tk.uditsharma.clientapp.model.ApiResponse;
 import tk.uditsharma.clientapp.util.Constants;
 import tk.uditsharma.clientapp.model.RegData;
-import tk.uditsharma.clientapp.model.UserDataAPI;
+import tk.uditsharma.clientapp.util.DaggerViewModelFactory;
 import tk.uditsharma.clientapp.util.Utility;
 import tk.uditsharma.clientapp.view.LoginActivity;
-import tk.uditsharma.clientapp.view.MapsActivity;
-import tk.uditsharma.clientapp.view.UserProfileActivity;
+import tk.uditsharma.clientapp.viewmodel.RegisterViewModel;
 
-public class RegisterActivity extends Activity {
+public class RegisterActivity extends AppCompatActivity {
+
+    @Inject
+    DaggerViewModelFactory viewModelFactory;
+    private RegisterViewModel rViewModel;
     ProgressDialog prgDialog;
     TextView errorMsg;
     EditText nameET;
@@ -35,6 +37,7 @@ public class RegisterActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
         errorMsg = (TextView)findViewById(R.id.register_error);
@@ -44,6 +47,7 @@ public class RegisterActivity extends Activity {
         prgDialog = new ProgressDialog(this);
         prgDialog.setMessage("Please wait...");
         prgDialog.setCancelable(false);
+        rViewModel = ViewModelProviders.of(this,viewModelFactory).get(RegisterViewModel.class);
     }
 
     public void registerUser(View view){
@@ -53,8 +57,50 @@ public class RegisterActivity extends Activity {
         if(Utility.isNotNull(name) && Utility.isNotNull(email) && Utility.isNotNull(password)){
             if(Utility.validate(email)){
                 prgDialog.show();
-                Controller controller = new Controller();
-                controller.start(name, email, password);
+                rViewModel.registerUser(name, email, password).observe(this, new Observer<ApiResponse<RegData>>() {
+                    @Override
+                    public void onChanged(@Nullable ApiResponse<RegData> rResponse) {
+                        if (rResponse == null) {
+                            Toast.makeText(RegisterActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
+                            prgDialog.dismiss();
+                            return;
+                        }
+                        if (rResponse.getError() == null) {
+                            if (rResponse.getCode() != 200) {
+                                prgDialog.hide();
+                                prgDialog.hide();
+                                switch (rResponse.getCode()) {
+                                    case 404:
+                                        Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
+                                        break;
+                                    case 500:
+                                        Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
+                                        break;
+                                    default :
+                                        Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
+                                }
+                                Log.d(Constants.LOG_REG,"Code: " + rResponse.getCode());
+                            }else {
+                                RegData data = rResponse.getData();
+                                prgDialog.hide();
+                                if(data.getStatus()){
+                                    setDefaultValues();
+                                    Toast.makeText(getApplicationContext(), "You are successfully registered!", Toast.LENGTH_LONG).show();
+                                }
+                                else{
+                                    errorMsg.setText(data.getError_msg());
+                                    Toast.makeText(getApplicationContext(), data.getError_msg(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        } else {
+                            Throwable e = rResponse.getError();
+                            prgDialog.dismiss();
+                            Toast.makeText(RegisterActivity.this, "Error is " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
+
+                        }
+                    }
+                });
             }
             else{
                 Toast.makeText(getApplicationContext(), "Please enter valid email", Toast.LENGTH_LONG).show();
@@ -72,16 +118,10 @@ public class RegisterActivity extends Activity {
         startActivity(loginIntent);
     }
 
-    public void testActivity(View view){
+    /*public void testActivity(View view){
         Intent testIntent = new Intent(this, UserProfileActivity.class);
         startActivity(testIntent);
-    }
-
-    public void toMapActivity(View view){
-        prgDialog.show();
-        Intent mIntent = new Intent(this, MapsActivity.class);
-        startActivity(mIntent);
-    }
+    }*/
 
     public void setDefaultValues(){
         nameET.setText("");
@@ -89,60 +129,6 @@ public class RegisterActivity extends Activity {
         pwdET.setText("");
     }
 
-    private class Controller implements Callback<RegData> {
-
-        public void start(String name, String uName, String pwd) {
-            Gson gson = new GsonBuilder()
-                    .setLenient()
-                    .create();
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(UserDataAPI.BASE_URL)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .build();
-
-            UserDataAPI userDataAPI = retrofit.create(UserDataAPI.class);
-
-            Call<RegData> call = userDataAPI.register(name, uName, pwd);
-            call.enqueue(this);
-
-        }
-
-        @Override
-        public void onResponse(Call<RegData> call, Response<RegData> response) {
-            if(response.isSuccessful()) {
-                RegData data = response.body();
-                prgDialog.hide();
-                if(data.getStatus()){
-                    setDefaultValues();
-                    Toast.makeText(getApplicationContext(), "You are successfully registered!", Toast.LENGTH_LONG).show();
-                }
-                else{
-                    errorMsg.setText(data.getError_msg());
-                    Toast.makeText(getApplicationContext(), data.getError_msg(), Toast.LENGTH_LONG).show();
-                }
-            } else {
-                prgDialog.hide();
-                switch (response.code()) {
-                    case 404:
-                        Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
-                        break;
-                    case 500:
-                        Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
-                        break;
-                    default :
-                        Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
-                }
-                Log.d(Constants.LOG_REG,"Code: " + response.code() + " Message: " + response.message());
-            }
-        }
-
-        @Override
-        public void onFailure(Call<RegData> call, Throwable t) {
-            prgDialog.dismiss();
-            t.printStackTrace();
-        }
-    }
 
     @Override
     public void onBackPressed() {
@@ -155,9 +141,4 @@ public class RegisterActivity extends Activity {
         prgDialog.dismiss();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        prgDialog.hide();
-    }
 }

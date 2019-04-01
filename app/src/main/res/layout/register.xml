@@ -97,7 +97,7 @@
             android:textColor="#228b22"
             android:textStyle="bold" />
 
-        <Button
+<!--        <Button
             android:id="@+id/btnLinkToTestScreen"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -106,18 +106,8 @@
             android:onClick="testActivity"
             android:text="Test"
             android:textColor="#228b22"
-            android:textStyle="bold" />
+            android:textStyle="bold" />-->
 
-        <Button
-            android:id="@+id/btnLinkToMaps"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dip"
-            android:background="#ff6347"
-            android:onClick="toMapActivity"
-            android:text="Map Test"
-            android:textColor="#fff"
-            android:textStyle="bold" />
     </LinearLayout>
 
 </ScrollView>
