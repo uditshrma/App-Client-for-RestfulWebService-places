@@ -65,7 +65,7 @@ public class UserListActivity extends AppCompatActivity {
                 } else {
                     Throwable e = userResponse.getError();
                     prgDialog.dismiss();
-                    Toast.makeText(UserListActivity.this, "Error is " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserListActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e(Constants.LOG_TAG, "Error is " + e.getLocalizedMessage());
 
                 }

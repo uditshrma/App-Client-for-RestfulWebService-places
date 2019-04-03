@@ -14,7 +14,7 @@ import retrofit2.http.FormUrlEncoded;
 
 public interface UserDataAPI {
 
-    String BASE_URL = "http://192.168.1.219:8080/RestfulWebServicePlaces/app/";
+    String BASE_URL = "http://192.168.1.221:8080/RestfulWebServicePlaces/app/";
 
     @GET("authenticate/")
     Call<LoginData> login();

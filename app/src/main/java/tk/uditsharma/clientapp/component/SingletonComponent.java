@@ -8,11 +8,12 @@ import dagger.android.support.AndroidSupportInjectionModule;
 import tk.uditsharma.clientapp.App;
 import tk.uditsharma.clientapp.module.ActivityBuilder;
 import tk.uditsharma.clientapp.module.ApplicationModule;
+import tk.uditsharma.clientapp.module.RegisterModule;
 import tk.uditsharma.clientapp.module.RoomModule;
 import tk.uditsharma.clientapp.module.ViewModelModule;
 
 @Singleton
-@Component(modules = {AndroidSupportInjectionModule.class, RoomModule.class, ActivityBuilder.class, ViewModelModule.class})
+@Component(modules = {AndroidSupportInjectionModule.class, RoomModule.class, ActivityBuilder.class, ViewModelModule.class, RegisterModule.class})
 public interface SingletonComponent {
 
     @Component.Builder

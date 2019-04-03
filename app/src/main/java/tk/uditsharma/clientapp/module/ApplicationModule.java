@@ -12,6 +12,7 @@ import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
 import java.sql.Timestamp;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -23,7 +24,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import tk.uditsharma.clientapp.model.UserDataAPI;
 import tk.uditsharma.clientapp.util.RequestAuthenticationInterceptor;
 
-@Module(includes = RegisterModule.class)
+@Module
 public class ApplicationModule {
 
     private final Application application;
@@ -54,6 +55,7 @@ public class ApplicationModule {
     }
 
     @Singleton
+    @Named("user_service")
     @Provides
     public UserDataAPI provideUserDataApi(Retrofit retrofit) {
         return retrofit.create(UserDataAPI.class);
@@ -84,7 +86,7 @@ public class ApplicationModule {
     @Singleton
     @Provides
     public GsonBuilder provideGsonBuilder() {
-        return new GsonBuilder();
+        return new GsonBuilder().setLenient();
     }
 
 }
