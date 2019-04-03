@@ -47,8 +47,6 @@ public class LoginActivity extends AppCompatActivity {
         errorMsg = (TextView)findViewById(R.id.login_error);
         emailET = (EditText)findViewById(R.id.loginEmail);
         pwdET = (EditText)findViewById(R.id.loginPassword);
-        emailET.setText("admin@mail.com");
-        pwdET.setText("secret");
         prgDialog = new ProgressDialog(this);
         prgDialog.setMessage("Please wait...");
         prgDialog.setCancelable(false);
