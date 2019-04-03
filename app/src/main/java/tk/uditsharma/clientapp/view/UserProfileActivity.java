@@ -90,11 +90,7 @@ public class UserProfileActivity extends AppCompatActivity {
         setSupportActionBar(tb);
         setValues();
         getPlacesData();
-        if (!Places.isInitialized()) {
-            //Key from values/google_maps_api.xml
-            Places.initialize(getApplicationContext(), getResources().getString(R.string.google_maps_key));
-        }
-        placesClient = Places.createClient(this);
+        createPlacesClient();
         setupCalendar();
     }
 
@@ -126,6 +122,14 @@ public class UserProfileActivity extends AppCompatActivity {
         userName.setText(cUser.userName());
         uPassword.setText(cUser.password());
         regDate.setText(cUser.regDate());
+    }
+
+    private void createPlacesClient() {
+        if (!Places.isInitialized()) {
+            //Key from values/google_maps_api.xml
+            Places.initialize(getApplicationContext(), getResources().getString(R.string.google_maps_key));
+        }
+        placesClient = Places.createClient(this);
     }
 
     private void setupCalendar() {
@@ -280,7 +284,6 @@ public class UserProfileActivity extends AppCompatActivity {
                     prgDialog.dismiss();
                     Toast.makeText(UserProfileActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e(Constants.LOG_TAG, "Error is " + e.getLocalizedMessage());
-
                 }
             }
         });
@@ -291,7 +294,6 @@ public class UserProfileActivity extends AppCompatActivity {
         Intent mapIntent = new Intent(this, MapsActivity.class);
         mapIntent.putExtra("place_id", selectedPlaceId);
         mapIntent.putExtra("selected_date", selectedDate);
-
         startActivity(mapIntent);
     }
 

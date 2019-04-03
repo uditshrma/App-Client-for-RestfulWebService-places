@@ -40,6 +40,11 @@ public class RegisterActivity extends AppCompatActivity {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
+        findViews();
+        rViewModel = ViewModelProviders.of(this,viewModelFactory).get(RegisterViewModel.class);
+    }
+
+    private void findViews() {
         errorMsg = (TextView)findViewById(R.id.register_error);
         nameET = (EditText)findViewById(R.id.registerName);
         emailET = (EditText)findViewById(R.id.registerEmail);
@@ -47,7 +52,6 @@ public class RegisterActivity extends AppCompatActivity {
         prgDialog = new ProgressDialog(this);
         prgDialog.setMessage("Please wait...");
         prgDialog.setCancelable(false);
-        rViewModel = ViewModelProviders.of(this,viewModelFactory).get(RegisterViewModel.class);
     }
 
     public void registerUser(View view){

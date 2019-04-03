@@ -44,13 +44,17 @@ public class LoginActivity extends AppCompatActivity {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+        findViews();
+        uViewModel = ViewModelProviders.of(this,viewModelFactory).get(LoginViewModel.class);
+    }
+
+    private void findViews() {
         errorMsg = (TextView)findViewById(R.id.login_error);
         emailET = (EditText)findViewById(R.id.loginEmail);
         pwdET = (EditText)findViewById(R.id.loginPassword);
         prgDialog = new ProgressDialog(this);
         prgDialog.setMessage("Please wait...");
         prgDialog.setCancelable(false);
-        uViewModel = ViewModelProviders.of(this,viewModelFactory).get(LoginViewModel.class);
     }
 
     public void loginUser(View view){

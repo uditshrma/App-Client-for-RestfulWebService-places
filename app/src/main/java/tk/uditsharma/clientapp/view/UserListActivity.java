@@ -50,28 +50,7 @@ public class UserListActivity extends AppCompatActivity {
         findViews();
         initToolbar("All Users List");
         setAdapter();
-        uViewModel = ViewModelProviders.of(this,viewModelFactory).get(UserViewModel.class);
-        uViewModel.getUserListResponse().observe(this, new Observer<ApiResponse<List<User>>>() {
-            @Override
-            public void onChanged(@Nullable ApiResponse<List<User>> userResponse) {
-                if (userResponse == null) {
-                    Toast.makeText(UserListActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
-                    prgDialog.dismiss();
-                    return;
-                }
-                if (userResponse.getError() == null) {
-                    recyclerViewAdapter.updateList(userResponse.getData());
-                    prgDialog.dismiss();
-                } else {
-                    Throwable e = userResponse.getError();
-                    prgDialog.dismiss();
-                    Toast.makeText(UserListActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e(Constants.LOG_TAG, "Error is " + e.getLocalizedMessage());
-
-                }
-            }
-        });
-
+        setupViewModel();
     }
 
     private void findViews() {
@@ -95,6 +74,30 @@ public class UserListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewAdapter = new RecyclerViewAdapter(this, prgDialog);
         recyclerView.setAdapter(recyclerViewAdapter);
+    }
+
+    private void setupViewModel() {
+        uViewModel = ViewModelProviders.of(this,viewModelFactory).get(UserViewModel.class);
+        uViewModel.getUserListResponse().observe(this, new Observer<ApiResponse<List<User>>>() {
+            @Override
+            public void onChanged(@Nullable ApiResponse<List<User>> userResponse) {
+                if (userResponse == null) {
+                    Toast.makeText(UserListActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
+                    prgDialog.dismiss();
+                    return;
+                }
+                if (userResponse.getError() == null) {
+                    recyclerViewAdapter.updateList(userResponse.getData());
+                    prgDialog.dismiss();
+                } else {
+                    Throwable e = userResponse.getError();
+                    prgDialog.dismiss();
+                    Toast.makeText(UserListActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(Constants.LOG_TAG, "Error is " + e.getLocalizedMessage());
+
+                }
+            }
+        });
     }
 
     @Override
