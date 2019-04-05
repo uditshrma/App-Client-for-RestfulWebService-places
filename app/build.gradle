@@ -41,12 +41,15 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation 'com.google.android.libraries.places:places:1.0.0'
+
     annotationProcessor 'com.google.auto.value:auto-value:1.5.4'
     annotationProcessor 'com.ryanharter.auto.value:auto-value-parcel:0.2.6'
     compileOnly 'com.jakewharton.auto.value:auto-value-annotations:1.5'
+
     implementation group: 'com.prolificinteractive', name: 'material-calendarview', version: '1.4.3'
 
     // Room components

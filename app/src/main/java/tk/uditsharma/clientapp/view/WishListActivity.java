@@ -37,21 +37,21 @@ public class WishListActivity extends AppCompatActivity implements ActionMode.Ca
     View cView;
     PlaceEntry selectedPlace;
     ProgressDialog prgDialog;
+    PlaceListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.place_list_layout);
-        RecyclerView recyclerView = findViewById(R.id.wishlist_recycler_view);
-        final PlaceListAdapter adapter = new PlaceListAdapter(this);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        findViews();
+        setAdapter();
+    }
+
+    private void findViews() {
         mPlaceViewModel = ViewModelProviders.of(this,viewModelFactory).get(PlaceViewModel.class);
         prgDialog = new ProgressDialog(this);
-        // Set Progress Dialog Text
         prgDialog.setMessage("Please wait...");
-        // Set Cancelable as False
         prgDialog.setCancelable(false);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab2);
@@ -72,9 +72,15 @@ public class WishListActivity extends AppCompatActivity implements ActionMode.Ca
         });
     }
 
+    private void setAdapter() {
+        RecyclerView recyclerView = findViewById(R.id.wishlist_recycler_view);
+        adapter = new PlaceListAdapter(this);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
+
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        // Inflate a menu resource providing context menu items
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.wish_list_actionmode, menu);
         return true;
@@ -119,16 +125,5 @@ public class WishListActivity extends AppCompatActivity implements ActionMode.Ca
         super.onDestroy();
         prgDialog.dismiss();
     }
-
-    /*public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == NEW_PLACE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            PlaceEntry place = new PlaceEntry(UserDao.getCurrentUser(), data.getStringExtra(MapsActivity.ID_REPLY), data.getStringExtra(MapsActivity.NAME_REPLY));
-            mPlaceViewModel.insert(place);
-        } else {
-            Toast.makeText(this, "Place not saved because empty.", Toast.LENGTH_SHORT).show();
-        }
-    }*/
 
 }
