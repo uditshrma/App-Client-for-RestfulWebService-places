@@ -18,7 +18,6 @@ public class AllPlacesResponse {
         this.placeId = placeId;
     }
     public AllPlacesResponse(String date, String placeId) {
-        super();
         this.date = date;
         this.placeId = placeId;
     }

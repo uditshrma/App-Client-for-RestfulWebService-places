@@ -106,6 +106,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        findViews();
+        mPlaceViewModel = ViewModelProviders.of(this,viewModelFactory).get(PlaceViewModel.class);
+        startRecyclerView();
+        getCommentData();
+        setMapFragment();
+    }
+
+    private void findViews(){
         commentText = (EditText)findViewById(R.id.commentBox);
         mScrollView = (NestedScrollView) findViewById(R.id.main_scrollview);
         dateText = (TextView) findViewById(R.id.selected_date_info);
@@ -122,23 +130,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             cDate = extras.getString("selected_date");
             dateText.setText("Add this place as visited on "+ cDate);
         }
-
-        mPlaceViewModel = ViewModelProviders.of(this,viewModelFactory).get(PlaceViewModel.class);
-        startRecyclerView();
-        getCommentData();
         setSupportActionBar(tb);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (ScrollGoogleMap) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        ((ScrollGoogleMap) getSupportFragmentManager()
-                .findFragmentById(R.id.map))
-                .setListener(new ScrollGoogleMap.OnTouchListener() {
-                    @Override
-                    public void onTouch() {
-                        mScrollView.requestDisallowInterceptTouchEvent(true);
-                    }
-                });
         alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setTitle("Edit Comment");
         input = new EditText(this);
@@ -155,7 +147,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } else {
                     Toast.makeText(MapsActivity.this, "Please enter a comment.", Toast.LENGTH_LONG).show();
                 }
-
             }
         });
 
@@ -166,6 +157,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // Canceled.
             }
         });*/
+    }
+
+    private void setMapFragment(){
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (ScrollGoogleMap) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        ((ScrollGoogleMap) getSupportFragmentManager()
+                .findFragmentById(R.id.map))
+                .setListener(new ScrollGoogleMap.OnTouchListener() {
+                    @Override
+                    public void onTouch() {
+                        mScrollView.requestDisallowInterceptTouchEvent(true);
+                    }
+                });
     }
 
     public void goToActionMode(View item, CommentResponse cResp, int pos){
@@ -286,9 +292,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Key from values/google_maps_api.xml
             Places.initialize(getApplicationContext(), getResources().getString(R.string.google_maps_key));
         }
-        // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
-        // Initialize the AutocompleteSupportFragment.
         AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 

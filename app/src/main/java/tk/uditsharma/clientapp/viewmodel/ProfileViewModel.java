@@ -5,6 +5,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -56,6 +57,32 @@ public class ProfileViewModel extends ViewModel {
         return pResponse.getValue();
     }
 
+    public void removePlaceItem(String date, String placeId){
+        ApiResponse<List<AllPlacesResponse>> temp = pResponse.getValue();
+        Iterator<AllPlacesResponse> it = temp.getData().iterator();
+        while (it.hasNext()) {
+            AllPlacesResponse placeItem = it.next();
+            if ((placeItem.getPlaceId().equals(placeId)) && (placeItem.getDate().equals(date))) {
+                it.remove();
+                pResponse.postValue(temp);
+                break;
+            }
+        }
+        /*for (AllPlacesResponse placeItem : pResponse.getValue().getData()){
+            if ((placeItem.getPlaceId().equals(placeId)) && (placeItem.getDate().equals(date))) {
+                pResponse.getValue().getData().remove(placeItem);
+                break;
+            }
+        }*/
+        for (AllPlacesResponse placeR : pResponse.getValue().getData()){
+            Log.i(Constants.LOG_TAG, "date: " + placeR.getDate()+"Id: " + placeR.getPlaceId());
+        }
+    }
+
+    /*private void setPlaceList() {
+        placeRepository.setCachedPlaceList(pResponse);
+    }*/
+
     public LiveData<ApiResponse<ResponseBody>> deletePlace(String uName, String placeId, String cDate) {
         compositeDisposable.add(placeRepository.deletePlacesFromWebService(uName, placeId, cDate)
                 .subscribeOn(Schedulers.io())
@@ -69,6 +96,7 @@ public class ProfileViewModel extends ViewModel {
             @Override
             public void onSuccess(List<AllPlacesResponse> value) {
                 pResponse.postValue(new ApiResponse<>(value));
+                //setPlaceList();
             }
 
             @Override

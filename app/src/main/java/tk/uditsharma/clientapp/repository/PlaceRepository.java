@@ -1,9 +1,7 @@
 package tk.uditsharma.clientapp.repository;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.util.List;
 
@@ -13,19 +11,18 @@ import javax.inject.Singleton;
 
 import io.reactivex.Single;
 import okhttp3.ResponseBody;
-import retrofit2.Call;
 import tk.uditsharma.clientapp.model.AllPlacesResponse;
 import tk.uditsharma.clientapp.model.ApiResponse;
 import tk.uditsharma.clientapp.model.PlaceEntry;
 import tk.uditsharma.clientapp.model.PlaceEntryDao;
 import tk.uditsharma.clientapp.model.UserDao;
 import tk.uditsharma.clientapp.model.UserDataAPI;
-import tk.uditsharma.clientapp.util.Constants;
 
 @Singleton
 public class PlaceRepository {
     private PlaceEntryDao mPlaceDao;
     private LiveData<List<PlaceEntry>> uAllPlaces;
+    private LiveData<ApiResponse<List<AllPlacesResponse>>> cachedPlacesList;
     private UserDataAPI userService;
 
     @Inject
@@ -80,6 +77,15 @@ public class PlaceRepository {
     public Single<List<AllPlacesResponse>> getPlacesApiData(String uName) {
         return userService.getPlaces(uName);
     }
+
+  /*  public LiveData<ApiResponse<List<AllPlacesResponse>>> getCachedPlaceList() {
+        return cachedPlacesList;
+    }
+
+    public void setCachedPlaceList(LiveData<ApiResponse<List<AllPlacesResponse>>> cList) {
+        this.cachedPlacesList = cList;
+    }*/
+
 
     public Single<ResponseBody> deletePlacesFromWebService(String uName, String pId, String date) {
         return userService.deletePlace(uName, pId, date);

@@ -45,13 +45,11 @@ import java.util.StringTokenizer;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
-import io.reactivex.disposables.CompositeDisposable;
 import okhttp3.ResponseBody;
 import tk.uditsharma.clientapp.model.ApiResponse;
 import tk.uditsharma.clientapp.util.Constants;
 import tk.uditsharma.clientapp.R;
 import tk.uditsharma.clientapp.model.UserDao;
-import tk.uditsharma.clientapp.model.UserDataAPI;
 import tk.uditsharma.clientapp.model.UserParcel;
 import tk.uditsharma.clientapp.model.AllPlacesResponse;
 import tk.uditsharma.clientapp.util.DaggerViewModelFactory;
@@ -77,9 +75,9 @@ public class UserProfileActivity extends AppCompatActivity {
     String selectedPlaceId = null;
     String selectedDate = null;
     UserParcel cUser;
-    List<CalendarDay> mDayList = new ArrayList<>();
     ProgressDialog prgDialog;
     private MenuItem deleteOption;
+    EventDecorator eDecor = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +106,7 @@ public class UserProfileActivity extends AppCompatActivity {
         prgDialog = new ProgressDialog(this);
         prgDialog.setMessage("Please wait...");
         prgDialog.setCancelable(false);
+        prgDialog.show();
         pBar.setVisibility(View.GONE);
         divider.setVisibility(View.GONE);
         info.setVisibility(View.GONE);
@@ -224,7 +223,8 @@ public class UserProfileActivity extends AppCompatActivity {
                             try {
                                 JSONObject jObj = new JSONObject(value.string());
                                 if(jObj.getString("status").equals("Success")){
-                                    Toast.makeText(UserProfileActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(UserProfileActivity.this, "Place Deleted", Toast.LENGTH_SHORT).show();
+                                    pViewModel.removePlaceItem(selectedDate, selectedPlaceId);
                                 } else {
                                     Toast.makeText(UserProfileActivity.this, "Could not deleted place", Toast.LENGTH_SHORT).show();
                                 }
@@ -255,12 +255,19 @@ public class UserProfileActivity extends AppCompatActivity {
         pViewModel.fetchPlaceList().observe(this, new Observer<ApiResponse<List<AllPlacesResponse>>>() {
             @Override
             public void onChanged(@Nullable ApiResponse<List<AllPlacesResponse>> placesResponse) {
+                Log.i(Constants.LOG_TAG, "inside observer. onChanged");
+
                 if (placesResponse == null) {
                     Toast.makeText(UserProfileActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
                     prgDialog.dismiss();
                     return;
                 }
                 if (placesResponse.getError() == null) {
+                    List<CalendarDay> mDayList = new ArrayList<>();
+                    if (eDecor != null){
+                        calendarView.removeDecorator(eDecor);
+                        calendarView.clearSelection();
+                    }
                     if (!placesResponse.getData().isEmpty()){
                         List<AllPlacesResponse> placeList = new ArrayList<>(placesResponse.getData());
                         for (AllPlacesResponse place : placeList) {
@@ -271,7 +278,8 @@ public class UserProfileActivity extends AppCompatActivity {
                             int d = Integer.parseInt(tokenizer.nextToken());
                             mDayList.add(CalendarDay.from(y, m, d));
                         }
-                        calendarView.addDecorator(new EventDecorator(Color.WHITE, mDayList));
+                        eDecor = new EventDecorator(Color.WHITE, mDayList);
+                        calendarView.addDecorator(eDecor);
                         prgDialog.dismiss();
                     } else{
                         prgDialog.dismiss();
