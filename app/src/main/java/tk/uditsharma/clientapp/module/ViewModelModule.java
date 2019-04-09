@@ -9,6 +9,7 @@ import dagger.multibindings.IntoMap;
 import tk.uditsharma.clientapp.interfaces.ViewModelKey;
 import tk.uditsharma.clientapp.util.DaggerViewModelFactory;
 import tk.uditsharma.clientapp.viewmodel.LoginViewModel;
+import tk.uditsharma.clientapp.viewmodel.MapViewModel;
 import tk.uditsharma.clientapp.viewmodel.PlaceViewModel;
 import tk.uditsharma.clientapp.viewmodel.ProfileViewModel;
 import tk.uditsharma.clientapp.viewmodel.RegisterViewModel;
@@ -41,6 +42,11 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ProfileViewModel.class)
     abstract ViewModel provideProfileViewModel(ProfileViewModel profileViewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MapViewModel.class)
+    abstract ViewModel provideMapViewModel(MapViewModel mapViewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindViewModelFactory(DaggerViewModelFactory factory);

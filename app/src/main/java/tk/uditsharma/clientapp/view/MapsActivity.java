@@ -2,16 +2,17 @@ package tk.uditsharma.clientapp.view;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -37,14 +38,11 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -54,25 +52,16 @@ import java.util.StringTokenizer;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableSingleObserver;
-import io.reactivex.schedulers.Schedulers;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.ResponseBody;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
+import tk.uditsharma.clientapp.model.ApiResponse;
 import tk.uditsharma.clientapp.view.adapter.CommentViewAdapter;
 import tk.uditsharma.clientapp.util.Constants;
 import tk.uditsharma.clientapp.R;
 import tk.uditsharma.clientapp.model.UserDao;
-import tk.uditsharma.clientapp.model.UserDataAPI;
 import tk.uditsharma.clientapp.model.CommentResponse;
 import tk.uditsharma.clientapp.util.DaggerViewModelFactory;
 import tk.uditsharma.clientapp.model.PlaceEntry;
+import tk.uditsharma.clientapp.viewmodel.MapViewModel;
 import tk.uditsharma.clientapp.viewmodel.PlaceViewModel;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, ActionMode.Callback {
@@ -87,19 +76,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     String cPlaceName = null;
     String cDate = null;
     ProgressDialog prgDialog;
-    String encodedString = null;
-    UserDataAPI userdataAPI;
     View cView;
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
-    List<CommentResponse> commentList = new ArrayList<>();
     CommentResponse selectedComment;
-    int selectedPos;
     EditText input;
     AlertDialog.Builder alertBuilder;
     AlertDialog alert;
     @Inject
     DaggerViewModelFactory viewModelFactory;
     private PlaceViewModel mPlaceViewModel;
+    private MapViewModel mMapViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +93,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_maps);
         findViews();
         mPlaceViewModel = ViewModelProviders.of(this,viewModelFactory).get(PlaceViewModel.class);
+        mMapViewModel = ViewModelProviders.of(this,viewModelFactory).get(MapViewModel.class);
         startRecyclerView();
         getCommentData();
         setMapFragment();
@@ -140,10 +126,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(DialogInterface dialog, int whichButton) {
                 String editText = input.getText().toString();
                 if (!editText.isEmpty()) {
-                    compositeDisposable.add(userdataAPI.editComment(UserDao.getCurrentUser(),editText,selectedComment.getId())
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribeWith(getEditCommentObserver(editText)));
+                    mMapViewModel.editComment(UserDao.getCurrentUser(),editText,selectedComment.getId()).observe(MapsActivity.this, new Observer<ApiResponse<ResponseBody>>() {
+                        @Override
+                        public void onChanged(@Nullable ApiResponse<ResponseBody> editResponse) {
+
+                            if (editResponse == null) {
+                                Toast.makeText(MapsActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
+                                prgDialog.dismiss();
+                                return;
+                            }
+                            if (editResponse.getError() == null) {
+                                String eText = input.getText().toString();
+                                try {
+                                    JSONObject jObj = new JSONObject(editResponse.getData().string());
+                                    if(jObj.getString("status").equals("Success")){
+                                        mMapViewModel.notifyEditComment(selectedComment.getId(), eText);
+                                        commentText.getText().clear();
+                                        Toast.makeText(MapsActivity.this, "Comment updated", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(MapsActivity.this, "Could not edit comment.", Toast.LENGTH_SHORT).show();
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                            } else {
+                                Throwable e = editResponse.getError();
+                                prgDialog.dismiss();
+                                Toast.makeText(MapsActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Log.e(Constants.LOG_TAG, "Error is " + e.getLocalizedMessage());
+                            }
+                        }
+                    });
                 } else {
                     Toast.makeText(MapsActivity.this, "Please enter a comment.", Toast.LENGTH_LONG).show();
                 }
@@ -174,11 +190,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
     }
 
-    public void goToActionMode(View item, CommentResponse cResp, int pos){
+    public void goToActionMode(View item, CommentResponse cResp){
             this.startActionMode(this);
             this.cView = item;
             this.selectedComment = cResp;
-            this.selectedPos = pos;
     }
 
     @Override
@@ -202,10 +217,38 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mode.finish();
                 return true;
             case R.id.delete_comment:
-                compositeDisposable.add(userdataAPI.deleteComment(UserDao.getCurrentUser(), selectedComment.getId())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(deleteCommentObserver()));
+                mMapViewModel.deleteComment(UserDao.getCurrentUser(), selectedComment.getId()).observe(this, new Observer<ApiResponse<ResponseBody>>() {
+                    @Override
+                    public void onChanged(@Nullable ApiResponse<ResponseBody> deleteResponse) {
+
+                        if (deleteResponse == null) {
+                            Toast.makeText(MapsActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
+                            prgDialog.dismiss();
+                            return;
+                        }
+                        if (deleteResponse.getError() == null) {
+                            try {
+                                JSONObject jObj = new JSONObject(deleteResponse.getData().string());
+                                if(jObj.getString("status").equals("Success")){
+                                    mMapViewModel.notifyRemoveComment(selectedComment.getId());
+                                    Toast.makeText(MapsActivity.this, "Comment Deleted", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(MapsActivity.this, "Could not delete Comment", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            Throwable e = deleteResponse.getError();
+                            prgDialog.dismiss();
+                            Toast.makeText(MapsActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.e(Constants.LOG_TAG, "Error is " + e.getLocalizedMessage());
+                        }
+                    }
+                });
                 mode.finish();
                 return true;
             default:
@@ -229,7 +272,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch (item.getItemId()) {
 
             case R.id.date_picker:
-                Toast.makeText(this, "Action Date Picker selected", Toast.LENGTH_SHORT).show();
                 int mYear;
                 int mMonth;
                 int mDay;
@@ -265,8 +307,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Toast.makeText(this, "Please Select a Place", Toast.LENGTH_SHORT).show();
                 } else {
                     PlaceEntry place = new PlaceEntry(UserDao.getCurrentUser(), cPlaceId, cPlaceName);
-                    Log.d(Constants.LOG_TAG,"from fav " + place.getPlaceName());
                     mPlaceViewModel.insert(place);
+                    Toast.makeText(this, "Added to wish list", Toast.LENGTH_SHORT).show();
                 }
                 return true;
             default:
@@ -301,7 +343,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                Log.i(Constants.LOG_TAG, "Place: " + place.getName() + ", " + place.getId());
                 cPlaceId = place.getId();
                 cPlaceName = place.getName();
                 mMap.clear();
@@ -318,7 +359,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (cPlaceId != null) {
             FetchPlaceRequest request = FetchPlaceRequest.builder(cPlaceId, Arrays.asList(Place.Field.NAME, Place.Field.LAT_LNG)).build();
             placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-                //Log.i(Constants.LOG_TAG, "Place found: " + response.getPlace().getName());
                 Place mPlace = response.getPlace();
                 cPlaceName = mPlace.getName();
                 mMap.clear();
@@ -344,196 +384,76 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void getCommentData() {
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
+        if (cPlaceId != null) {
+            mMapViewModel.fetchCommentList(cPlaceId).observe(this, new Observer<ApiResponse<List<CommentResponse>>>() {
+                @Override
+                public void onChanged(@Nullable ApiResponse<List<CommentResponse>> commentResponse) {
 
-        Log.d(Constants.LOG_TAG,"inside createUserDataAPI of userProfile");
+                    if (commentResponse == null) {
+                        Toast.makeText(MapsActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
+                        prgDialog.dismiss();
+                        return;
+                    }
+                    if (commentResponse.getError() == null) {
+                        List<CommentResponse> commentList = new ArrayList<>();
+                        commentList = commentResponse.getData();
+                        cAdapter.setCommentList(commentList);
+                        prgDialog.dismiss();
 
-        try {
-            encodedString = Base64.encodeToString(
-                    UserDao.getToken().getBytes("UTF-8"),Base64.NO_WRAP);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+                    } else {
+                        Throwable e = commentResponse.getError();
+                        prgDialog.dismiss();
+                        Toast.makeText(MapsActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e(Constants.LOG_TAG, "Error is " + e.getLocalizedMessage());
+                    }
+                }
+            });
+        } else {
+            prgDialog.dismiss();
+            Toast.makeText(MapsActivity.this, "No place is selected.", Toast.LENGTH_LONG).show();
         }
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                Request originalRequest = chain.request();
 
-                Request.Builder builder = originalRequest.newBuilder().header("Authorization",
-                        "Bearer " + encodedString);
-                Log.d(Constants.LOG_TAG,"inside okHttpClient of userProfile");
-
-                Request newRequest = builder.build();
-                return chain.proceed(newRequest);
-            }
-        }).build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(UserDataAPI.BASE_URL)
-                .client(okHttpClient)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
-        userdataAPI = retrofit.create(UserDataAPI.class);
-        compositeDisposable.add(userdataAPI.getComments(cPlaceId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(getCommentsObserver()));
-    }
-
-    private DisposableSingleObserver<List<CommentResponse>> getCommentsObserver() {
-        return new DisposableSingleObserver<List<CommentResponse>>() {
-            @Override
-            public void onSuccess(List<CommentResponse> value) {
-                if (!value.isEmpty()) {
-                    commentList.addAll(value);
-
-                    for (CommentResponse cObject : commentList) {
-                        cAdapter.addComment(cObject);
-                    }
-                    prgDialog.dismiss();
-
-                } else {
-                    prgDialog.dismiss();
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-                Toast.makeText(MapsActivity.this, "Arror occured", Toast.LENGTH_SHORT).show();
-                prgDialog.dismiss();
-            }
-        };
-    }
-
-    private DisposableSingleObserver<ResponseBody> getAddCommentObserver() {
-        return new DisposableSingleObserver<ResponseBody>() {
-            @Override
-            public void onSuccess(ResponseBody value) {
-                String cText = commentText.getText().toString();
-                try {
-                    JSONObject jObj = new JSONObject(value.string());
-                    if(jObj.getString("status").equals("Success")){
-                        cAdapter.addComment(new CommentResponse(jObj.getInt("comment_id"),
-                                UserDao.getCurrentName(), UserDao.getCurrentUser(), cText));
-                        commentText.getText().clear();
-                        Toast.makeText(MapsActivity.this, "Comment created", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(MapsActivity.this, "Could not create comment.", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-                Toast.makeText(MapsActivity.this, "Error occurred in creating comment.", Toast.LENGTH_SHORT).show();
-            }
-        };
-    }
-
-    private DisposableSingleObserver<ResponseBody> getEditCommentObserver(String txt) {
-        return new DisposableSingleObserver<ResponseBody>() {
-            @Override
-            public void onSuccess(ResponseBody value) {
-                try {
-                    JSONObject jObj = new JSONObject(value.string());
-                    if(jObj.getString("status").equals("Success")){
-                        cAdapter.updateComment(selectedPos, new CommentResponse(selectedComment.getId(),
-                                UserDao.getCurrentName(), UserDao.getCurrentUser(), txt));
-                        commentText.getText().clear();
-                        Toast.makeText(MapsActivity.this, "Comment updated", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(MapsActivity.this, "Could not edit comment.", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-                Toast.makeText(MapsActivity.this, "Error occurred in editing comment.", Toast.LENGTH_SHORT).show();
-            }
-        };
-    }
-
-    private DisposableSingleObserver<ResponseBody> addPlaceObserver() {
-        return new DisposableSingleObserver<ResponseBody>() {
-            @Override
-            public void onSuccess(ResponseBody value) {
-                try {
-                    JSONObject jObj = new JSONObject(value.string());
-                    if(jObj.getString("status").equals("Success")){
-                        Toast.makeText(MapsActivity.this, "Done", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(MapsActivity.this, "Could not add place", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-                Toast.makeText(MapsActivity.this, "Error occurred in adding place.", Toast.LENGTH_SHORT).show();
-            }
-        };
-    }
-
-    private DisposableSingleObserver<ResponseBody> deleteCommentObserver() {
-        return new DisposableSingleObserver<ResponseBody>() {
-            @Override
-            public void onSuccess(ResponseBody value) {
-                try {
-                    JSONObject jObj = new JSONObject(value.string());
-                    if(jObj.getString("status").equals("Success")){
-                        cAdapter.removeComment(selectedPos);
-                        Toast.makeText(MapsActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(MapsActivity.this, "Could not delete Comment", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-                Toast.makeText(MapsActivity.this, "Error occurred in deleting Comment.", Toast.LENGTH_SHORT).show();
-            }
-        };
     }
 
     public void onClickComment(View view){
         String cText = commentText.getText().toString();
         if (cPlaceId != null) {
             if (!cText.isEmpty()) {
-                compositeDisposable.add(userdataAPI.postComment(UserDao.getCurrentUser(),cText,cPlaceId)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(getAddCommentObserver()));
+                mMapViewModel.postComment(UserDao.getCurrentUser(),cText,cPlaceId).observe(this, new Observer<ApiResponse<ResponseBody>>() {
+                    @Override
+                    public void onChanged(@Nullable ApiResponse<ResponseBody> addResponse) {
+
+                        if (addResponse == null) {
+                            Toast.makeText(MapsActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
+                            prgDialog.dismiss();
+                            return;
+                        }
+                        if (addResponse.getError() == null) {
+                            String cText = commentText.getText().toString();
+                            try {
+                                JSONObject jObj = new JSONObject(addResponse.getData().string());
+                                if(jObj.getString("status").equals("Success")){
+                                    mMapViewModel.notifyAddComment(new CommentResponse(jObj.getInt("comment_id"),
+                                            UserDao.getCurrentName(), UserDao.getCurrentUser(), cText));
+                                    commentText.getText().clear();
+                                    Toast.makeText(MapsActivity.this, "Comment created", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(MapsActivity.this, "Could not create comment.", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                        } else {
+                            Throwable e = addResponse.getError();
+                            prgDialog.dismiss();
+                            Toast.makeText(MapsActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.e(Constants.LOG_TAG, "Error is " + e.getLocalizedMessage());
+                        }
+                    }
+                });
             } else {
                 Toast.makeText(MapsActivity.this, "Please enter a comment.", Toast.LENGTH_LONG).show();
             }
@@ -543,20 +463,47 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void onClickAdd(View view){
+        if (cPlaceId != null) {
+            mMapViewModel.addPlace(UserDao.getCurrentUser(),cPlaceId,cDate).observe(this, new Observer<ApiResponse<ResponseBody>>() {
+                @Override
+                public void onChanged(@Nullable ApiResponse<ResponseBody> placesResponse) {
 
-        compositeDisposable.add(userdataAPI.addPlace(UserDao.getCurrentUser(),cPlaceId,cDate)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(addPlaceObserver()));
+                    if (placesResponse == null) {
+                        Toast.makeText(MapsActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
+                        prgDialog.dismiss();
+                        return;
+                    }
+                    if (placesResponse.getError() == null) {
+                        try {
+                            JSONObject jObj = new JSONObject(placesResponse.getData().string());
+                            if(jObj.getString("status").equals("Success")){
+                                mMapViewModel.notifyPlaceUpdate(cPlaceId, cDate);
+                                Toast.makeText(MapsActivity.this, "Place Added.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(MapsActivity.this, "Could not add place", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
+                    } else {
+                        Throwable e = placesResponse.getError();
+                        prgDialog.dismiss();
+                        Toast.makeText(MapsActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e(Constants.LOG_TAG, "Error is " + e.getLocalizedMessage());
+                    }
+                }
+            });
+        }else {
+            Toast.makeText(MapsActivity.this, "Please select a place.", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (compositeDisposable != null && !compositeDisposable.isDisposed()) {
-            compositeDisposable.dispose();
-        }
         prgDialog.dismiss();
     }
 

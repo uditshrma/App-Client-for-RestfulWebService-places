@@ -224,7 +224,7 @@ public class UserProfileActivity extends AppCompatActivity {
                                 JSONObject jObj = new JSONObject(value.string());
                                 if(jObj.getString("status").equals("Success")){
                                     Toast.makeText(UserProfileActivity.this, "Place Deleted", Toast.LENGTH_SHORT).show();
-                                    pViewModel.removePlaceItem(selectedDate, selectedPlaceId);
+                                    pViewModel.notifyRemovePlace(selectedDate, selectedPlaceId);
                                 } else {
                                     Toast.makeText(UserProfileActivity.this, "Could not deleted place", Toast.LENGTH_SHORT).show();
                                 }
@@ -255,7 +255,6 @@ public class UserProfileActivity extends AppCompatActivity {
         pViewModel.fetchPlaceList().observe(this, new Observer<ApiResponse<List<AllPlacesResponse>>>() {
             @Override
             public void onChanged(@Nullable ApiResponse<List<AllPlacesResponse>> placesResponse) {
-                Log.i(Constants.LOG_TAG, "inside observer. onChanged");
 
                 if (placesResponse == null) {
                     Toast.makeText(UserProfileActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
@@ -284,7 +283,6 @@ public class UserProfileActivity extends AppCompatActivity {
                     } else{
                         prgDialog.dismiss();
                         Toast.makeText(UserProfileActivity.this, "No data Available", Toast.LENGTH_SHORT).show();
-
                     }
 
                 } else {

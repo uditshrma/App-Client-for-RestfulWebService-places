@@ -12,11 +12,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import io.reactivex.Single;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import tk.uditsharma.clientapp.model.AllPlacesResponse;
 import tk.uditsharma.clientapp.model.ApiResponse;
 import tk.uditsharma.clientapp.model.LoginData;
 import tk.uditsharma.clientapp.model.RegData;

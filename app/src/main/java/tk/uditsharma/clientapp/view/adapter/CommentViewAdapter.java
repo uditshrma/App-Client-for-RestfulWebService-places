@@ -37,6 +37,11 @@ public class CommentViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         notifyDataSetChanged();
     }
 
+    public void setCommentList(List<CommentResponse> comments) {
+        this.commentList = comments;
+        notifyDataSetChanged();
+    }
+
     public void removeComment(int commentPos) {
         this.commentList.remove(commentPos);
         notifyDataSetChanged();
@@ -76,7 +81,7 @@ public class CommentViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 public boolean onLongClick(View v) {
                     CommentResponse cComment = commentList.get(getAdapterPosition());
                     if(cComment.getUsermail().equals(UserDao.getCurrentUser())){
-                        ((MapsActivity)mContext).goToActionMode(v, cComment, getAdapterPosition());
+                        ((MapsActivity)mContext).goToActionMode(v, cComment);
                         v.setSelected(true);
                         return true;
                     }
