@@ -51,7 +51,6 @@
                 android:layout_marginStart="8dp"
                 android:elevation="2dp"
                 android:paddingTop="8dp"
-                android:text="Name"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="20sp"
                 app:layout_constraintBaseline_toBaselineOf="@+id/p_user_id"
@@ -64,7 +63,6 @@
                 android:layout_marginStart="50dp"
                 android:elevation="2dp"
                 android:paddingTop="8dp"
-                android:text="User ID"
                 app:layout_constraintStart_toEndOf="@+id/display_name"
                 app:layout_constraintTop_toTopOf="@+id/profile_background" />
 
@@ -76,7 +74,6 @@
                 android:layout_marginTop="6dp"
                 android:elevation="2dp"
                 android:paddingBottom="8dp"
-                android:text="Date"
                 app:layout_constraintStart_toStartOf="@+id/profile_background"
                 app:layout_constraintTop_toBottomOf="@+id/display_name" />
 
@@ -87,7 +84,6 @@
                 android:layout_marginStart="50dp"
                 android:elevation="2dp"
                 android:paddingBottom="8dp"
-                android:text="----"
                 app:layout_constraintBaseline_toBaselineOf="@+id/p_reg_date"
                 app:layout_constraintStart_toEndOf="@+id/p_reg_date" />
 
@@ -97,6 +93,7 @@
                 android:layout_height="61dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
+                tools:ignore="ContentDescription"
                 app:layout_constraintBottom_toBottomOf="@+id/profile_pic"
                 app:layout_constraintStart_toEndOf="@+id/profile_pic"
                 app:layout_constraintTop_toTopOf="parent"
@@ -110,6 +107,7 @@
                 android:layout_marginTop="8dp"
                 android:outlineProvider="bounds"
                 android:elevation="5dp"
+                tools:ignore="ContentDescription"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/user_profile" />
@@ -123,7 +121,6 @@
                 android:layout_marginEnd="10dp"
                 android:maxLines="4"
                 android:singleLine="false"
-                android:text="Information"
                 app:layout_constraintEnd_toStartOf="@+id/to_maps"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider_grd" />
@@ -135,7 +132,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="45dp"
                 android:onClick="toMapsActivity"
-                android:text="Check"
+                android:text="@string/check"
                 android:theme="@style/AppTheme.Button"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/divider_grd" />
@@ -147,6 +144,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="60dp"
+                tools:ignore="ContentDescription"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/calendarView"

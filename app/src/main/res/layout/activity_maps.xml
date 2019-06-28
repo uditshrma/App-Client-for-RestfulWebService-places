@@ -60,6 +60,7 @@
                     android:layout_height="2dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginEnd="60dp"
+                    tools:ignore="ContentDescription"
                     android:src="@drawable/divider_gradient"/>
 
                 <RelativeLayout
@@ -92,7 +93,7 @@
                         android:layout_marginEnd="10dp"
                         android:layout_toEndOf="@id/div"
                         android:onClick="onClickAdd"
-                        android:text="Add"
+                        android:text="@string/add"
                         android:textAllCaps="false"
                         android:textSize="16sp"
                         android:theme="@style/AppTheme.Button" />
@@ -102,12 +103,13 @@
                     android:layout_height="2dp"
                     android:layout_marginBottom="15dp"
                     android:layout_marginTop="15dp"
+                    tools:ignore="ContentDescription"
                     android:src="@color/quantum_grey"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Comments:"
+                    android:text="@string/comments"
                     android:textSize="25sp"
                     android:textStyle="bold" />
 
@@ -129,7 +131,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="7"
-                        android:hint="Enter comment." />
+                        android:hint="@string/enter_comment"
+                        android:importantForAutofill="no" />
 
                     <ImageButton
                         android:id="@+id/add_comment"
@@ -137,6 +140,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="7dp"
                         android:layout_weight="1"
+                        android:contentDescription="@string/add_comment"
                         android:onClick="onClickComment"
                         android:src="@drawable/mcv_action_next"
                         android:theme="@style/AppTheme.Button" />
