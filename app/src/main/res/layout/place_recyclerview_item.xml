@@ -27,7 +27,6 @@
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
                 android:textColor="#F1F0F0"
-                android:text="Place Item"
                 android:textSize="20sp" />
 
         </LinearLayout>

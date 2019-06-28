@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class WishListActivity extends AppCompatActivity implements ActionMode.Ca
     @Inject
     DaggerViewModelFactory viewModelFactory;
     private PlaceViewModel mPlaceViewModel;
+    TextView eInfo;
     View cView;
     PlaceEntry selectedPlace;
     ProgressDialog prgDialog;
@@ -53,6 +55,7 @@ public class WishListActivity extends AppCompatActivity implements ActionMode.Ca
         prgDialog = new ProgressDialog(this);
         prgDialog.setMessage("Please wait...");
         prgDialog.setCancelable(false);
+        eInfo = (TextView)findViewById(R.id.empty_info);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab2);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -67,7 +70,13 @@ public class WishListActivity extends AppCompatActivity implements ActionMode.Ca
             @Override
             public void onChanged(@Nullable final List<PlaceEntry> mAllPlaces) {
                 Log.d(Constants.LOG_TAG,"inside onChanged");
-                adapter.setPlaces(mAllPlaces);
+                if (mAllPlaces != null && !mAllPlaces.isEmpty()) {
+                    eInfo.setVisibility(View.GONE);
+                    adapter.setPlaces(mAllPlaces);
+                }else{
+                    eInfo.setVisibility(View.VISIBLE);
+                }
+
             }
         });
     }

@@ -16,12 +16,17 @@ import android.widget.Toast;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
+import okhttp3.Credentials;
 import tk.uditsharma.clientapp.model.ApiResponse;
+import tk.uditsharma.clientapp.model.LoginData;
+import tk.uditsharma.clientapp.model.UserDao;
 import tk.uditsharma.clientapp.util.Constants;
 import tk.uditsharma.clientapp.model.RegData;
 import tk.uditsharma.clientapp.util.DaggerViewModelFactory;
 import tk.uditsharma.clientapp.util.Utility;
+import tk.uditsharma.clientapp.view.HomeActivity;
 import tk.uditsharma.clientapp.view.LoginActivity;
+import tk.uditsharma.clientapp.viewmodel.LoginViewModel;
 import tk.uditsharma.clientapp.viewmodel.RegisterViewModel;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -29,6 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Inject
     DaggerViewModelFactory viewModelFactory;
     private RegisterViewModel rViewModel;
+    private LoginViewModel lViewModel;
     ProgressDialog prgDialog;
     TextView errorMsg;
     EditText nameET;
@@ -42,6 +48,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.register);
         findViews();
         rViewModel = ViewModelProviders.of(this,viewModelFactory).get(RegisterViewModel.class);
+        lViewModel = ViewModelProviders.of(this,viewModelFactory).get(LoginViewModel.class);
     }
 
     private void findViews() {
@@ -122,10 +129,47 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(loginIntent);
     }
 
-    /*public void testActivity(View view){
-        Intent testIntent = new Intent(this, UserProfileActivity.class);
-        startActivity(testIntent);
-    }*/
+    public void anonymousLogin(View view){
+        lViewModel.addCredentials(Credentials.basic("user@mail.com", "text"));
+        prgDialog.show();
+        lViewModel.logInUser().observe(this, new Observer<ApiResponse<LoginData>>() {
+            @Override
+            public void onChanged(@Nullable ApiResponse<LoginData> lResponse) {
+                if (lResponse == null) {
+                    Toast.makeText(RegisterActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
+                    prgDialog.dismiss();
+                    return;
+                }
+                if (lResponse.getError() == null) {
+                    if (lResponse.getCode() != 200) {
+                        prgDialog.hide();
+                        if (lResponse.getCode() == 401) {
+                            Toast.makeText(RegisterActivity.this, "Unauthorized.", Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        lViewModel.addToken(lResponse.getData().getEncoded());
+                        UserDao.setToken(lResponse.getData().getEncoded());
+                        UserDao.setCurrentUser("user@mail.com");
+                        UserDao.setCurrentName(lResponse.getData().getName());
+                        navigateToHomeActivity(lResponse.getData().getName());
+                    }
+                } else {
+                    Throwable e = lResponse.getError();
+                    prgDialog.dismiss();
+                    Toast.makeText(RegisterActivity.this, "Error is " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+
+                }
+            }
+        });
+    }
+
+    public void navigateToHomeActivity(String uName){
+        Intent homeIntent = new Intent(this, HomeActivity.class);
+        homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        homeIntent.putExtra("current_user", uName);
+        startActivity(homeIntent);
+    }
 
     public void setDefaultValues(){
         nameET.setText("");

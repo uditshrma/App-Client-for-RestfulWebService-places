@@ -30,7 +30,7 @@
             android:id="@+id/registerName"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter your Name" />
+            android:hint="@string/enter_your_name" />
 
         <!-- Email Label -->
 
@@ -44,7 +44,7 @@
             android:id="@+id/registerEmail"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter your Email ID"
+            android:hint="@string/enter_your_email_id"
             android:inputType="textEmailAddress" />
 
         <!-- Password Label -->
@@ -60,7 +60,7 @@
             android:id="@+id/registerPassword"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Password"
+            android:hint="@string/enter_password"
             android:inputType="textPassword" />
 
         <!-- Error message -->
@@ -93,9 +93,19 @@
             android:layout_marginTop="20dip"
             android:background="@null"
             android:onClick="navigateToLoginActivity"
-            android:text="Login"
+            android:text="@string/login"
             android:textColor="#228b22"
             android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/login_anonym"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dip"
+            android:background="#0ECCE7"
+            android:onClick="anonymousLogin"
+            android:text="@string/enter_as_anonymous"
+            android:textColor="#fff" />
 
 <!--        <Button
             android:id="@+id/btnLinkToTestScreen"

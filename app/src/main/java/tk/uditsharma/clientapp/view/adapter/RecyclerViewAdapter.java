@@ -61,11 +61,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             genericViewHolder.userName.setText(model.getName());
             genericViewHolder.userId.setText(model.getUserName());
-            if (model.getPassword().equals("Access Denied")) {
-                genericViewHolder.user_pass.setText("---");
-            } else {
-                genericViewHolder.user_pass.setText(model.getPassword());
-            }
             genericViewHolder.reg_date.setText(model.getRegDateString());
 
 
@@ -90,7 +85,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         CardView cv;
         private TextView userName;
         private TextView userId;
-        private TextView user_pass;
         private TextView reg_date;
 
         public ViewHolder(final View itemView) {
@@ -99,7 +93,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             this.cv = (CardView)itemView.findViewById(R.id.cv);
             this.userName = (TextView) itemView.findViewById(R.id.user_name);
             this.userId = (TextView) itemView.findViewById(R.id.user_id);
-            this.user_pass = (TextView) itemView.findViewById(R.id.pass_text);
             this.reg_date = (TextView) itemView.findViewById(R.id.reg_date);
 
             itemView.setOnClickListener(new View.OnClickListener() {

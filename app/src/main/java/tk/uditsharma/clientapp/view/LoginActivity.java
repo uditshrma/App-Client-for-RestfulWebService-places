@@ -106,6 +106,41 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    public void loginAsAnonymous(View view){
+        uViewModel.addCredentials(Credentials.basic("user@mail.com", "text"));
+        prgDialog.show();
+        uViewModel.logInUser().observe(this, new Observer<ApiResponse<LoginData>>() {
+            @Override
+            public void onChanged(@Nullable ApiResponse<LoginData> lResponse) {
+                if (lResponse == null) {
+                    Toast.makeText(LoginActivity.this, "Error Occurred", Toast.LENGTH_SHORT).show();
+                    prgDialog.dismiss();
+                    return;
+                }
+                if (lResponse.getError() == null) {
+                    if (lResponse.getCode() != 200) {
+                        prgDialog.hide();
+                        if (lResponse.getCode() == 401) {
+                            Toast.makeText(LoginActivity.this, "Unauthorized.", Toast.LENGTH_SHORT).show();
+                        }
+                    }else {
+                        uViewModel.addToken(lResponse.getData().getEncoded());
+                        UserDao.setToken(lResponse.getData().getEncoded());
+                        UserDao.setCurrentUser("user@mail.com");
+                        UserDao.setCurrentName(lResponse.getData().getName());
+                        navigateToHomeActivity(lResponse.getData().getName());
+                    }
+                } else {
+                    Throwable e = lResponse.getError();
+                    prgDialog.dismiss();
+                    Toast.makeText(LoginActivity.this, "Error is " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+
+                }
+            }
+        });
+    }
+
     public void navigateToHomeActivity(String uName){
         Intent homeIntent = new Intent(this, HomeActivity.class);
         homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

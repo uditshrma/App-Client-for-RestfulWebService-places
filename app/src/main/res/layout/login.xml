@@ -21,7 +21,7 @@
             android:id="@+id/loginEmail"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter your Email ID"
+            android:hint="@string/enter_your_email_id"
             android:inputType="textEmailAddress" />
 
         <TextView
@@ -34,7 +34,7 @@
             android:id="@+id/loginPassword"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter Password"
+            android:hint="@string/enter_password"
             android:inputType="textPassword" />
 
         <TextView
@@ -52,7 +52,7 @@
             android:layout_marginTop="20dip"
             android:background="#ff6347"
             android:onClick="loginUser"
-            android:text="Login"
+            android:text="@string/login"
             android:textColor="#fff" />
 
         <Button
@@ -62,9 +62,19 @@
             android:layout_marginTop="40dip"
             android:background="@null"
             android:onClick="navigateToRegisterActivity"
-            android:text="Signup"
+            android:text="@string/signup"
             android:textColor="#228b22"
             android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/anonym_login"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dip"
+            android:background="#0ECCE7"
+            android:onClick="loginAsAnonymous"
+            android:text="@string/enter_as_anonymous"
+            android:textColor="#fff" />
     </LinearLayout>
 
 </ScrollView>

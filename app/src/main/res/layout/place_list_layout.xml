@@ -24,6 +24,18 @@
 
         </android.support.design.widget.AppBarLayout>
 
+        <TextView
+            android:id="@+id/empty_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/nothing_added_to_wishlist"
+            android:visibility="gone"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:paddingTop="5dp"
+            android:textColor="#727272"
+            android:textSize="40sp" />
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/wishlist_recycler_view"
             android:layout_width="match_parent"

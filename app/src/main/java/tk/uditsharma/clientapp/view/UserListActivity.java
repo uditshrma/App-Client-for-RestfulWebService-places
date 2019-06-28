@@ -37,7 +37,6 @@ public class UserListActivity extends AppCompatActivity {
     private UserViewModel uViewModel;
     private RecyclerView recyclerView;
     private Toolbar toolbar;
-    private FloatingActionButton fab;
     RecyclerViewAdapter recyclerViewAdapter;
     ProgressDialog prgDialog;
 
@@ -56,7 +55,6 @@ public class UserListActivity extends AppCompatActivity {
     private void findViews() {
         toolbar = (Toolbar) findViewById(R.id.user_list_toolbar);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        fab = (FloatingActionButton) findViewById(R.id.fab);
         prgDialog = new ProgressDialog(this);
         prgDialog.setMessage("Please wait...");
         prgDialog.setCancelable(false);
