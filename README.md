@@ -41,6 +41,6 @@ Finally, the view role in this pattern is to observe a ViewModel observable to g
 # Screenshots:
 
 
-Screenshot 1 | Screenshot 2
------------- | -------------
-![screenshot1](https://github.com/uditshrma/App-Client-for-RestfulWebService-places/blob/master/screen_shots/Screenshot_1.jpeg) | ![screenshot2](https://github.com/uditshrma/App-Client-for-RestfulWebService-places/blob/master/screen_shots/Screenshot_2.jpeg)
+Screenshot 1 | Screenshot 2 | Screenshot 3
+------------ | ------------- | -------------
+![screenshot1](https://github.com/uditshrma/App-Client-for-RestfulWebService-places/blob/master/screen_shots/Screenshot_1.jpeg) | ![screenshot2](https://github.com/uditshrma/App-Client-for-RestfulWebService-places/blob/master/screen_shots/Screenshot_2.jpeg) | ![screenshot3](https://github.com/uditshrma/App-Client-for-RestfulWebService-places/blob/master/screen_shots/Screenshot_3.jpeg)
