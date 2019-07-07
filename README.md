@@ -26,7 +26,6 @@ Finally, the view role in this pattern is to observe a ViewModel observable to g
 ## UI
 - [Material Design](https://material.io/develop/android/docs/getting-started/) for helping creating UI in coordinance with Google's Material Design guidelines.
 - [ConstraintLayout](https://developer.android.com/training/constraint-layout) for creating layouts.
-- [Material Dialogs](https://github.com/afollestad/material-dialogs) for creating dialogs.
 - [Material Calendar View](https://github.com/prolificinteractive/material-calendarview) for calendar.
 ## Networking
 - [Retrofit](https://square.github.io/retrofit/) (+[okhttp for interceptor](https://github.com/square/okhttp)) for API calls.
